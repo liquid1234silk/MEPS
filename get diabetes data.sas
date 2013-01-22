@@ -221,6 +221,8 @@ data consum;
         peter.con06
         peter.con07
         peter.con08;
+	* a new variable NID is added, combining year and DUPERSID;
+	NID= trim(put(year,4.))!!trim(left(DUPERSID));
 run;
 
 data medsum;
@@ -229,6 +231,10 @@ data medsum;
         peter.med06
         peter.med07
         peter.med08;
+	NID= trim(put(year,4.))!!trim(left(DUPERSID));
+run;
+
+proc print data= medsum (obs= 20);
 run;
 
 *mark the patients with diabetes in medication files;
@@ -245,7 +251,7 @@ data meddia;
 run;
 
 proc sort data= meddia nodupkey;
-    by DUPERSID year;
+    by NID;
 run;
 
 proc print data= meddia (obs=100);
@@ -254,22 +260,22 @@ run;
 *mark the patients with diabetes in consolidated files;
 data condia;
     set consum;
-        keep DIABDX DUPERSID year var2;
+        keep DIABDX NID var2;
         if DIABDX= 1 then var2= 1;
 run;
 
 proc sort data= condia nodupkey;
-    by DUPERSID year;
+    by NID;
 run;
 
 *combine the patients from two files;
 data total;
     merge condia
           meddia;
-    by DUPERSID year;
+    by NID;
         if var1= 1 or var2= 1 then dia= 1;
         else dia= 0;
-    keep DUPERSID year dia;
+    keep NID dia;
 run;
 
 proc print data= total (obs=100);
@@ -283,4 +289,5 @@ run;
 proc freq data= peter.total;
     tables dia;
 run;
+
 
