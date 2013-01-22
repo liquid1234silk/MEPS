@@ -181,18 +181,6 @@ year=2008;
 ;                                                                             
 run; 
 
-proc contents data=peter.con04;
-run;
-
-proc print data=peter.con04 (obs=10);
-run; 
-
-proc contents data=peter.med04;
-run;
-
-proc print data = peter.med04 (obs = 10); 
-run; 
-
 *test the mutual part of consolidated files and medication files;
 
 %macro test(con, med);
@@ -227,38 +215,36 @@ run;
 
 *merge consolidated files and medication files, respectively;
 data consum;
-set peter.con04
-peter.con05
-peter.con06
-peter.con07
-peter.con08
-;
+    set peter.con04
+        peter.con05
+        peter.con06
+        peter.con07
+        peter.con08;
 run;
 
 data medsum;
-set peter.med04
-peter.med05
-peter.med06
-peter.med07
-peter.med08
-;
+    set peter.med04
+        peter.med05
+        peter.med06
+        peter.med07
+        peter.med08;
 run;
 
 *mark the patients from medication files;
 data meddia;
-set medsum;
-if ICD9CODX= '250' then para2= 1;
-else para2= 2;
+    set medsum;
+        if ICD9CODX= '250' then para1= 1;
+        else para1= 2;
 
-if CCCODEX= '049' or CCCODEX= '050' then para3=1;
-else para3= 2;
+        if CCCODEX= '049' or CCCODEX= '050' then para2=1;
+        else para2= 2;
 
-if para2= 1 or para3= 1 then var1= 1;
-drop para2 para3;
+        if para1= 1 or para2= 1 then var1= 1;
+    drop para1 para2;
 run;
 
 proc sort data= meddia nodupkey;
-by DUPERSID year;
+    by DUPERSID year;
 run;
 
 proc print data= meddia (obs=100);
@@ -267,32 +253,32 @@ run;
 *mark the patients from consolidated files;
 data condia;
     set consum;
-    keep DIABDX DUPERSID year var2;
-    if DIABDX= 1 then var2= 1;
+        keep DIABDX DUPERSID year var2;
+        if DIABDX= 1 then var2= 1;
 run;
 
 proc sort data= condia nodupkey;
-by DUPERSID year;
+    by DUPERSID year;
 run;
 
 *combine the patients from two tables;
 data total;
-merge condia
-meddia;
-by DUPERSID year;
-if var1= 1 or var2= 1 then dia= 1;
-else dia= 0;
-keep DUPERSID year dia;
+    merge condia
+          meddia;
+    by DUPERSID year;
+        if var1= 1 or var2= 1 then dia= 1;
+        else dia= 0;
+    keep DUPERSID year dia;
 run;
 
 proc print data= total (obs=100);
 run;
 
 data peter.total;
-set total;
+    set total;
 run;
 
 proc freq data= peter.total;
-tables dia;
+    tables dia;
 run;
 
