@@ -129,3 +129,7 @@ run;
 proc freq data= all;
     tables identity;
 run;
+
+data peter.identity;
+    set all;
+run;
