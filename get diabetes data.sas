@@ -1,6 +1,7 @@
 
 dm 'log; clear; output; clear';
 
+*assign library name and file name;
 libname peter 'F:\meps\sasdataset';
 libname library "F:\meps\sasformat";
 
@@ -230,7 +231,7 @@ data medsum;
         peter.med08;
 run;
 
-*mark the patients from medication files;
+*mark the patients with diabetes in medication files;
 data meddia;
     set medsum;
         if ICD9CODX= '250' then para1= 1;
@@ -250,7 +251,7 @@ run;
 proc print data= meddia (obs=100);
 run;
 
-*mark the patients from consolidated files;
+*mark the patients with diabetes in consolidated files;
 data condia;
     set consum;
         keep DIABDX DUPERSID year var2;
@@ -261,7 +262,7 @@ proc sort data= condia nodupkey;
     by DUPERSID year;
 run;
 
-*combine the patients from two tables;
+*combine the patients from two files;
 data total;
     merge condia
           meddia;
@@ -274,6 +275,7 @@ run;
 proc print data= total (obs=100);
 run;
 
+*store the data in a permanent dataset;
 data peter.total;
     set total;
 run;
