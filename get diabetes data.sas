@@ -282,11 +282,11 @@ proc print data= total (obs=100);
 run;
 
 *store the data in a permanent dataset;
-data peter.total;
+data peter.dia;
     set total;
 run;
 
-proc freq data= peter.total;
+proc freq data= peter.dia;
     tables dia;
 run;
 
