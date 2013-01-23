@@ -1,10 +1,10 @@
-*
-Father 1 (fathers of child)
-Mother 2 (mothers of child)
-Child  3 (peopel between 5 and 17 years old)
-Other  4 (including those 1.who are younger than 5 
-                          2.adults who have no child
-                          3.adults whose child is younger than 5 or older than 17);
+*Mark the identity of the population:;
+*Father 1 (fathers of child)
+ Mother 2 (mothers of child)
+ Child  3 (peopel between 5 and 17 years old)
+ Other  4 (including those 1.who are younger than 5 
+                           2.adults who have no child
+                           3.adults whose child is younger than 5 or older than 17);
 
 
 
@@ -120,7 +120,7 @@ data all;
 	if child= 3 then identity= 3;
 
 	if identity= . then identity= 4;
-	drop child child_number daddy mommy;
+	keep NID identity;
 run;
 
 proc print data= all (obs= 20);
