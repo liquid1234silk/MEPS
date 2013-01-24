@@ -1,3 +1,15 @@
+libname peter "F:/meps/sasdataset";
+
+********************************************
+Mark the depression and abnormal MCS and PCS
+
+dep 1- depressed
+    0- not depressed
+pcs 1- relatively low
+    0- normal
+mcs 1- relatively low
+    0- normal
+********************************************;
 
 *mark the depression;
 data dep;
@@ -9,6 +21,103 @@ run;
 
 proc print data= dep(obs= 20);
 run;
+
+*figure out average mcs and pcs of fathers;
+data child1;
+	set a;
+		if 5<=age<=17;
+	keep age duid pid DUPERSID MOPID42X DAPID42X year NID;
+	if 	DAPID42X>0 or MOPID42X>0;
+run;
+
+proc sort data= child1;
+    by NID;
+run;
+
+proc sort data= a;
+    by NID;
+run;
+
+proc sql;
+	create table dad as 
+        select a.*, c.DAPID42X as child_number
+		from a left join child1 as c
+		on  a.duid=c.duid and a.pid=c.DAPID42X and a.year=c.year;
+quit;
+
+proc sort data= dad nodupkey;
+    by NID;
+    where child_number ne .;
+run;
+
+proc print data= dad (obs= 20);
+run;
+
+proc sql noprint;
+    select mean(mcs42) into: dmcs from dad;
+	select mean(pcs42) into: dpcs from dad;
+quit;
+
+%put &dmcs &dpcs;
+
+*figure out average mcs and pcs of mothers;
+proc sql;
+	create table mom as 
+        select a.*, c.MOPID42X as child_number
+		from a left join child1 as c
+		on  a.duid=c.duid and a.pid=c.MOPID42X and a.year=c.year;
+quit;
+
+proc sort data= mom nodupkey;
+    by NID;
+    where child_number ne .;
+run;
+
+proc sql noprint;
+    select mean(mcs42) into: mmcs from mom;
+	select mean(pcs42) into: mpcs from mom;
+quit;
+
+%put &mmcs &mpcs;
+
+*mark the fathers and mothers with relatively high mcs and pcs;
+data dad1;
+    set dad;
+	    if mcs42 >= &dmcs then mcs= 0;
+	    else mcs= 1;
+	    if pcs42 >= &dpcs then pcs= 0;
+	    else pcs= 1;
+run;
+
+data mom1;
+    set mom;
+	    if mcs42 >= &mmcs then mcs= 0;
+	    else mcs= 1;
+	    if pcs42 >= &mpcs then pcs= 0;
+	    else pcs= 1;
+run;
+
+data score;
+    merge a dad1 mom1 dep;
+	by NID;
+	keep NID mcs pcs dep;
+run;
+
+proc print data= score (obs= 20);
+run;
+
+data peter.dep;
+    set score;
+run;
+
+********************************************
+Mark the behaviour problem of children
+according to CIS 
+
+problem 1- behaviour problem(high CIS)
+        0- normal
+********************************************;
+
 
 *give dataset 'child' a variable 'problem' to indicate the cis status of the child;
 *1 - cis>=16
