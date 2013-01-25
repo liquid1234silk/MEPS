@@ -281,9 +281,17 @@ run;
 proc print data= total (obs=100);
 run;
 
+*build a format;
+proc format library= library;
+value dia 
+0= 'normal'
+1= 'diabetes'
+;
+
 *store the data in a permanent dataset;
 data peter.dia;
     set total;
+	format dia dia.;
 run;
 
 proc freq data= peter.dia;

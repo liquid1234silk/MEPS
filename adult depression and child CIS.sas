@@ -80,7 +80,7 @@ quit;
 
 %put &mmcs &mpcs;
 
-*mark the fathers and mothers with relatively high mcs and pcs;
+*mark the fathers and mothers with relatively low mcs and pcs;
 data dad1;
     set dad;
 	    if mcs42 >= &dmcs then mcs= 0;
@@ -108,6 +108,13 @@ run;
 
 data peter.dep;
     set score;
+	format dep dep.
+           pcs pcs.
+		   mcs mcs.;
+run;
+
+proc freq data= peter.dep;
+    table dep pcs mcs;
 run;
 
 ********************************************
@@ -372,14 +379,36 @@ proc sql noprint;
         on a.DUID= c.DUID and a.PID= c.PID and a.year= c.year;
 quit;
 
-proc print data= peter.cis (obs=50);
-run;
-
 proc freq data=childcis;
 	tables problem;
 run;
 
+proc format library= library;
+value dep
+0= 'normal'
+1= 'depressed'
+;
+
+value pcs
+0= 'normal'
+1= 'low'
+;
+
+value mcs
+0= 'normal'
+1= 'low'
+;
+
+value problem
+0= 'normal'
+1= 'behaviour problem'
+; 
+
 data peter.cis (keep= NID problem);
     set childcis;
 	NID= trim(put(year,4.))!!trim(left(DUPERSID));
+	format problem problem.;
+run;
+
+proc print data= peter.cis (obs=50);
 run;

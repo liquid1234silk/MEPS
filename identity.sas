@@ -6,7 +6,13 @@
                            2.adults who have no child
                            3.adults whose child is younger than 5 or older than 17);
 
-
+proc format library= library;
+value identity
+1= 'father'
+2= 'mother'
+3= 'child'
+4= 'other'
+;
 
 *mark the child;
 data child1;
@@ -126,10 +132,11 @@ run;
 proc print data= all (obs= 20);
 run;
 
-proc freq data= all;
-    tables identity;
-run;
-
 data peter.identity;
     set all;
+	format identity identity.;
+run;
+
+proc freq data= peter.identity;
+    tables identity;
 run;

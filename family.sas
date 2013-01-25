@@ -10,7 +10,7 @@ data childdouble;
 		if 5<=age<=17;
 	keep age duid pid DUPERSID MOPID42X DAPID42X year NID id;
 	if 	DAPID42X>0 and MOPID42X>0;
-	id= 'd';
+	id= 2;
 run;
 
 *child from sing-parent family (11327);
@@ -22,8 +22,8 @@ data childsingle;
 	if MOPID42X= . then MOPID42X= -1;
 
 	t= DAPID42X * MOPID42X;
-	if t<0 then id= 's';
-	if id= 's';
+	if t<0 then id= 1;
+	if id= 1;
 run;
 
 proc print data= childsingle (obs= 20);
@@ -53,7 +53,7 @@ run;
 
 data dd;
     set dadd;
-    id= 'd';
+    id= 2;
 run;
 
 
@@ -72,7 +72,7 @@ run;
 
 data ds;
     set dads;
-    id= 's';
+    id= 1;
 run;
 
 *mark the mother;
@@ -91,7 +91,7 @@ run;
 
 data md;
     set momd;
-    id= 'd';
+    id= 2;
 run;
 
 
@@ -110,7 +110,7 @@ run;
 
 data ms;
     set moms;
-    id= 's';
+    id= 1;
 run;
 
 data sum;
@@ -122,10 +122,17 @@ run;
 proc print data= sum (obs= 20);
 run;
 
-proc freq data= sum;
-    tables id;
-run;
+proc format library= library;
+value id
+1= 'one-parent family'
+2= 'two-parent family'
+;
 
 data peter.family;
     set sum;
+	format id id.;
+run;
+
+proc freq data= peter.family;
+    tables id;
 run;
