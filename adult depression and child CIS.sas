@@ -53,6 +53,11 @@ run;
 proc print data= dad (obs= 20);
 run;
 
+data dad;
+    set dad;
+	if pcs42 >0 and mcs42 >0;
+run;
+
 proc sql noprint;
     select mean(mcs42) into: dmcs from dad;
 	select mean(pcs42) into: dpcs from dad;
@@ -71,6 +76,11 @@ quit;
 proc sort data= mom nodupkey;
     by NID;
     where child_number ne .;
+run;
+
+data mom;
+    set mom;
+	if pcs42 >0 and mcs42 >0;
 run;
 
 proc sql noprint;
@@ -404,9 +414,18 @@ value problem
 1= 'behaviour problem'
 ; 
 
-data peter.cis (keep= NID problem);
+
+data childcis1;
     set childcis;
-	NID= trim(put(year,4.))!!trim(left(DUPERSID));
+    NID= trim(put(year,4.))!!trim(left(DUPERSID));
+run;
+
+proc sort data= childcis1;
+    by NID;
+run;
+
+data peter.cis (keep= NID problem);
+    set childcis1;
 	format problem problem.;
 run;
 
