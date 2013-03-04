@@ -1,5 +1,6 @@
 libname peter "F:/meps/sasdataset";
 libname library "F:/meps/sasformat";
+libname out "F:/meps/sasoutput";
 
 option fmtsearch= (library);
 
@@ -118,13 +119,26 @@ data test12;
 	    if dad= 1 or dad= 2;
 run;
 
-
 proc surveyfreq data= test12;
     tables dad*problem/ chisq;
+	ods output Chisq= out.test12;
     strata varstr;
     cluster varpsu;
     weight weight;
 run;
+
+proc print; run;
+
+
+
+
+
+
+
+
+
+
+
 
 **********************************************
 In two-parent family, mothers with or without
